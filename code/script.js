@@ -1,13 +1,61 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const circle = {
-  x: 100,
-  y: 15,
-  size: 15,
-  dx: 0,
-  dy: 2,
+// ghost_block
+
+const player_ghost = {
+  x: 0,
+  y: 0,
+  width: 450,
+  height: 480,
+  frameX: 1,
+  frameY: 0,
+  speed: 2,
+  moving: false,
 };
+
+function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
+  ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
+}
+
+const playerSprite = new Image();
+playerSprite.src = "./images/ghost_block.png";
+
+// ghost rest animation
+
+function GhostRestingAnimation() {
+  if (player_ghost.frameX === 1 || player_ghost.frameX === 0) {
+    if (player_ghost.frameX === 1) {
+      setTimeout(ghost_XF0, 200);
+    } else if (player_ghost.frameX === 0) {
+      setTimeout(ghost_XF1, 200);
+    }
+  } else if (player_ghost.frameX === 2 || player_ghost.frameX === 3) {
+    if (player_ghost.frameX === 2) {
+      setTimeout(ghost_XF3, 200);
+    } else if (player_ghost.frameX === 3) {
+      setTimeout(ghost_XF2, 200);
+    }
+  }
+}
+
+setInterval(GhostRestingAnimation, 200);
+
+function ghost_XF0() {
+  player_ghost.frameX = 0;
+}
+
+function ghost_XF1() {
+  player_ghost.frameX = 1;
+}
+
+function ghost_XF2() {
+  player_ghost.frameX = 2;
+}
+
+function ghost_XF3() {
+  player_ghost.frameX = 3;
+}
 
 // player configuration
 
@@ -22,29 +70,6 @@ const player = {
   dx: 0,
   dy: 0,
 };
-
-function drawPlayer() {
-  ctx.drawImage(image, player.x, player.y, player.w, player.h);
-}
-
-function drawCircle() {
-  ctx.beginPath();
-  ctx.arc(circle.x, circle.y, circle.size, 0, Math.PI * 2);
-  ctx.fillStyle = "red";
-  ctx.fill();
-}
-
-// function safeZone() {
-//   ctx.lineWidth = 1;
-//   ctx.strokeStyle = "#333";
-//   ctx.strokeRect(200, 0, 1, canvas.height);
-//   ctx.strokeRect(400, 0, 1, canvas.height);
-
-//   // fillText()
-//   ctx.font = "20px Arial";
-//   ctx.fillStyle = "#333";
-//   ctx.fillText("SAFE ZONE", 245, 100);
-// }
 
 function drawPlayer() {
   ctx.drawImage(image, player.x, player.y, player.w, player.h);
@@ -83,34 +108,7 @@ function detectWalls() {
   }
 }
 
-// ghost_block
-
-function update() {
-  clear();
-
-  drawPlayer();
-
-  newPos();
-
-  // drawCircle();
-
-  // safeZone();
-
-  // change position
-
-  circle.x += circle.dx;
-  circle.y += circle.dy;
-
-  // Detect side walls
-  if (circle.x + circle.size > canvas.width || circle.x - circle.size < 0) {
-    circle.dx *= -1;
-  }
-  if (circle.y + circle.size > canvas.height || circle.y - circle.size < 0) {
-    circle.dy *= -1;
-  }
-
-  requestAnimationFrame(update);
-}
+// movement
 
 function moveUp() {
   player.dy = -player.speed;
@@ -122,10 +120,12 @@ function moveDown() {
 
 function moveRight() {
   player.dx = player.speed;
+  player_ghost.frameX = 2;
 }
 
 function moveLeft() {
   player.dx = -player.speed;
+  player_ghost.frameX = 1;
 }
 
 function keyDown(e) {
@@ -154,6 +154,30 @@ function keyUp(e) {
     player.dx = 0;
     player.dy = 0;
   }
+}
+
+// main function
+
+function update() {
+  clear();
+
+  drawPlayer();
+
+  newPos();
+
+  drawSprite(
+    playerSprite,
+    player_ghost.width * player_ghost.frameX,
+    player_ghost.height * player_ghost.frameY,
+    player_ghost.width,
+    player_ghost.height,
+    200,
+    200,
+    80,
+    85
+  );
+
+  requestAnimationFrame(update);
 }
 
 update();
