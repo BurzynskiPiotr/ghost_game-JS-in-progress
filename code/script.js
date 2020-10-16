@@ -4,13 +4,15 @@ const ctx = canvas.getContext("2d");
 // ghost_block
 
 const player_ghost = {
-  x: 0,
-  y: 0,
+  x: 200,
+  y: 200,
   width: 450,
   height: 480,
+  dx: 0,
+  dy: 0,
   frameX: 1,
   frameY: 0,
-  speed: 2,
+  speed: 5,
   moving: false,
 };
 
@@ -23,14 +25,18 @@ playerSprite.src = "./images/ghost_block.png";
 
 // ghost rest animation
 
-function GhostRestingAnimation() {
+function GhostRestingAnimationLeft() {
   if (player_ghost.frameX === 1 || player_ghost.frameX === 0) {
     if (player_ghost.frameX === 1) {
       setTimeout(ghost_XF0, 200);
     } else if (player_ghost.frameX === 0) {
       setTimeout(ghost_XF1, 200);
     }
-  } else if (player_ghost.frameX === 2 || player_ghost.frameX === 3) {
+  }
+}
+
+function GhostRestingAnimationRight() {
+  if (player_ghost.frameX === 2 || player_ghost.frameX === 3) {
     if (player_ghost.frameX === 2) {
       setTimeout(ghost_XF3, 200);
     } else if (player_ghost.frameX === 3) {
@@ -39,7 +45,8 @@ function GhostRestingAnimation() {
   }
 }
 
-setInterval(GhostRestingAnimation, 200);
+// var GhostaAnimationLeft = setInterval(GhostRestingAnimationLeft, 200);
+// var GhostaAnimationRight = setInterval(GhostRestingAnimationRight, 200);
 
 function ghost_XF0() {
   player_ghost.frameX = 0;
@@ -59,72 +66,56 @@ function ghost_XF3() {
 
 // player configuration
 
-const image = document.getElementById("player");
-
-const player = {
-  w: 90,
-  h: 90,
-  x: 300,
-  y: 300,
-  speed: 5,
-  dx: 0,
-  dy: 0,
-};
-
-function drawPlayer() {
-  ctx.drawImage(image, player.x, player.y, player.w, player.h);
-}
-
 function clear() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function newPos() {
-  player.x += player.dx;
-  player.y += player.dy;
+  player_ghost.x += player_ghost.dx;
+  player_ghost.y += player_ghost.dy;
 
   detectWalls();
 }
 
 function detectWalls() {
   // Left wall
-  if (player.x < 0) {
-    player.x = 0;
+  if (player_ghost.x < 0) {
+    player_ghost.x = 0;
   }
 
   // Right Wall
-  if (player.x + player.w > canvas.width) {
-    player.x = canvas.width - player.w;
+  if (player_ghost.x + 80 > canvas.width) {
+    player_ghost.x = canvas.width - 80;
   }
 
-  // Top wall
-  if (player.y < 0) {
-    player.y = 0;
+  // // Top wall
+  if (player_ghost.y < 0) {
+    player_ghost.y = 0;
   }
 
-  // Bottom Wall
-  if (player.y + player.h > canvas.height) {
-    player.y = canvas.height - player.h;
+  // // Bottom Wall
+  if (player_ghost.y + 90 > canvas.height) {
+    player_ghost.y = canvas.height - 90;
   }
 }
 
 // movement
 
 function moveUp() {
-  player.dy = -player.speed;
+  player_ghost.dy = -player_ghost.speed;
 }
 
 function moveDown() {
-  player.dy = player.speed;
+  player_ghost.dy = player_ghost.speed;
 }
 
 function moveRight() {
-  player.dx = player.speed;
+  player_ghost.dx = player_ghost.speed;
   player_ghost.frameX = 2;
 }
 
 function moveLeft() {
-  player.dx = -player.speed;
+  player_ghost.dx = -player_ghost.speed;
   player_ghost.frameX = 1;
 }
 
@@ -151,8 +142,8 @@ function keyUp(e) {
     e.key == "Down" ||
     e.key == "ArrowDown"
   ) {
-    player.dx = 0;
-    player.dy = 0;
+    player_ghost.dx = 0;
+    player_ghost.dy = 0;
   }
 }
 
@@ -160,8 +151,6 @@ function keyUp(e) {
 
 function update() {
   clear();
-
-  drawPlayer();
 
   newPos();
 
@@ -171,8 +160,8 @@ function update() {
     player_ghost.height * player_ghost.frameY,
     player_ghost.width,
     player_ghost.height,
-    200,
-    200,
+    player_ghost.x,
+    player_ghost.y,
     80,
     85
   );
